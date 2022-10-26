@@ -10,15 +10,6 @@ import java.util.Map;
 public class Main {
 
     public static void main(String[] args) throws IOException {
-        /*NOTA PARA EL PROFESOR:
-         * Las Funciones de conversion de codigo y la de creacion de indices las cree previo a que me dijera que
-         * solo tomara en cuenta IBANes de españa por lo tanto lo estaba haciendo antes para todos
-         * como en principio funcionan las deje y use.
-         *
-         * Sé que me dijo que no programara mas de lo que me piden pero antes de que me hiciera la aclaracion
-         * fue la manera mas optima que pense para comparar las letras de los IBAN.
-         *
-         * */
 
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         String entrada;
@@ -31,20 +22,7 @@ public class Main {
             if (entrada.equals("FIN")) {
                 System.out.println("Programa Terminado");
             } else {
-
-                String cod_verficacion = entrada.substring(0, 4);
-                String entrada_cut = entrada.substring(4);
-
-                cod_verficacion = conversionCodigo(cod_verficacion);
-
-                entrada_cut += cod_verficacion;
-
-                BigInteger iban = new BigInteger(entrada_cut);
-                BigInteger divisor = new BigInteger("97");
-
-                BigInteger modulo = iban.remainder(divisor);
-
-                if (modulo.equals(BigInteger.ONE)) {
+                if (conversionCodigo(entrada)) {
                     System.out.println("IBAN valido");
                 } else {
                     System.out.println("IBAN Invalido");
@@ -57,14 +35,19 @@ public class Main {
     }
 
 
-    public static String conversionCodigo(String codigo) {
+    public static boolean conversionCodigo(String entrada) {
 
+        boolean isValid;
         StringBuilder cod_convertido = new StringBuilder();
         Map<String, String> indices;
         indices = crearIndice();
 
-        char[] letras = codigo.substring(0, 2).toCharArray();
-        String num = codigo.substring(2);
+        String cod_verficacion = entrada.substring(0, 4);
+        String entrada_cut = entrada.substring(4);
+
+
+        char[] letras = cod_verficacion.substring(0, 2).toCharArray();
+        String num = cod_verficacion.substring(2);
 
         for (char letra : letras) {
             String digito = String.valueOf(letra);
@@ -74,7 +57,16 @@ public class Main {
 
         cod_convertido.append(num);
 
-        return cod_convertido.toString();
+        entrada_cut += cod_convertido.toString();
+
+        BigInteger iban = new BigInteger(entrada_cut);
+        BigInteger divisor = new BigInteger("97");
+
+        BigInteger modulo = iban.remainder(divisor);
+
+        isValid = modulo.equals(BigInteger.ONE);
+
+        return isValid;
     }
 
     public static HashMap<String, String> crearIndice() {
